@@ -12,9 +12,58 @@ This overlay downloads binaries directly from Anthropic's distribution servers, 
 - ✅ SHA256 checksum verification
 - ✅ Flake and non-flake support
 
-## Usage
+## Unfree Licence Notice
 
-> **Note:** Claude Code has an unfree licence. You need to allow unfree packages to use this overlay.
+Claude Code is distributed under an unfree licence. You must explicitly allow unfree packages to use this overlay.
+
+### Option 1: Per-Package Allowance (Recommended)
+
+The safest approach - only allows Claude Code specifically:
+
+**For NixOS** (`configuration.nix`):
+```nix
+nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+  "claude"
+];
+```
+
+**For home-manager** (`home.nix`):
+```nix
+nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+  "claude"
+];
+```
+
+**For standalone config** (`~/.config/nixpkgs/config.nix`):
+```nix
+{
+  allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "claude"
+  ];
+}
+```
+
+### Option 2: Environment Variable (Temporary)
+
+For ad-hoc usage without persistent configuration:
+
+```bash
+NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
+```
+
+**Note:** Requires `--impure` flag to access environment variables in flakes.
+
+### Option 3: Global Allow (Not Recommended)
+
+Only use if you understand the implications:
+
+```nix
+nixpkgs.config.allowUnfree = true;
+```
+
+This permits **all** unfree packages system-wide without explicit review.
+
+## Usage
 
 ### With Flakes
 
@@ -37,8 +86,10 @@ NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
     nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        ({ pkgs, ... }: {
-          nixpkgs.config.allowUnfree = true;
+        ({ pkgs, lib, ... }: {
+          nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+            "claude"
+          ];
           nixpkgs.overlays = [ claude-code-overlay.overlays.default ];
           environment.systemPackages = [ pkgs.claudepkgs.default ];
         })
@@ -62,7 +113,8 @@ NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
     homeConfigurations."user@hostname" = home-manager.lib.homeManagerConfiguration {
       pkgs = import nixpkgs {
         system = "x86_64-linux";
-        config.allowUnfree = true;
+        config.allowUnfreePredicate = pkg:
+          builtins.elem (nixpkgs.lib.getName pkg) [ "claude" ];
         overlays = [ claude-code-overlay.overlays.default ];
       };
 
@@ -84,7 +136,8 @@ let
     url = "https://github.com/ryoppippi/claude-code-overlay/archive/main.tar.gz";
   });
   pkgs = import <nixpkgs> {
-    config.allowUnfree = true;
+    config.allowUnfreePredicate = pkg:
+      builtins.elem (pkgs.lib.getName pkg) [ "claude" ];
     overlays = [ claude-code-overlay.overlays.default ];
   };
 in
