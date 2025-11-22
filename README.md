@@ -165,6 +165,31 @@ in
 
 ## Development
 
+### Setup development environment
+
+**Option 1: Using direnv (Recommended)**
+
+If you have [direnv](https://direnv.net/) installed:
+
+```bash
+direnv allow
+```
+
+This automatically loads the development environment and installs pre-commit hooks when you enter the directory.
+
+**Option 2: Manual**
+
+Enter the development shell to set up pre-commit hooks:
+
+```bash
+nix develop
+```
+
+This will automatically install git pre-commit hooks that run:
+- **alejandra** - Nix code formatter
+- **deadnix** - Dead code detection
+- **statix** - Nix linter
+
 ### Update sources manually
 
 ```bash
@@ -177,6 +202,16 @@ nix develop
 ```bash
 NIXPKGS_ALLOW_UNFREE=1 nix build --impure
 ./result/bin/claude --version
+```
+
+### Run checks manually
+
+```bash
+# Format all Nix files
+nix fmt
+
+# Run all checks (formatting, linting, builds)
+nix flake check
 ```
 
 ## Credits
