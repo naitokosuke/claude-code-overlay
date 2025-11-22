@@ -35,9 +35,12 @@
       '';
 
       meta = with lib; {
-        description = "Claude Code CLI - AI-powered coding assistant";
+        description = "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster";
         homepage = "https://claude.ai/code";
+        downloadPage = "https://github.com/anthropics/claude-code/releases";
+        changelog = "https://github.com/anthropics/claude-code/releases";
         license = licenses.unfree;
+        mainProgram = "claude";
         platforms = platforms.linux ++ platforms.darwin;
         maintainers = [];
       };
