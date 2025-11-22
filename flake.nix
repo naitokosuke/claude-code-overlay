@@ -75,10 +75,8 @@
   in
     outputs
     // {
-      # Overlay that can be imported so you can access the packages
-      # using claudepkgs.default or claude-code
+      # Overlay that provides claude-code package
       overlays.default = _final: prev: {
-        claudepkgs = outputs.packages.${prev.system};
         claude-code = outputs.packages.${prev.system}.default;
       };
     };
