@@ -27,7 +27,13 @@
   }: let
     systems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
     outputs = flake-utils.lib.eachSystem systems (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfreePredicate = pkg:
+          builtins.elem (nixpkgs.lib.getName pkg) [
+            "claude"
+          ];
+      };
     in rec {
       # Pre-commit hooks configuration
       checks = {
