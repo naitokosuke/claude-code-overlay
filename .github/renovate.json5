@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended",
   ],
+  "timezone": "Asia/Tokyo",
   "schedule": [
     "every 1 hour",
   ],
@@ -15,37 +16,34 @@
   "nix": {
     "enabled": true,
   },
-  "flake": {
-    "enabled": true,
-  },
   // GitHub Actions updates
   "github-actions": {
     "enabled": true,
   },
-  // Custom rules for flake inputs
-  "regexManagers": [
-    {
-      "fileMatch": ["^flake\\.nix$"],
-      "matchStrings": [
-        '\\s+url = "github:(?<depName>[^/]+/[^/]+)/(?<currentValue>[^"]+)"',
-      ],
-      "datasourceTemplate": "github-releases",
-      "versioningTemplate": "semver",
-    },
-  ],
   "packageRules": [
     {
-      "matchPackageNames": ["nixos/nixpkgs"],
+      "matchManagers": ["nix"],
+      "matchPackageNames": ["nixpkgs"],
       "schedule": [
         "every weekend",
       ],
     },
-    // Auto-merge minor and patch updates
+    // Auto-merge for GitHub Actions
     {
+      "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
+    },
+    // Group flake.lock updates
+    {
+      "matchManagers": ["nix"],
+      "matchFiles": ["flake.lock"],
+      "groupName": "nix flake dependencies",
+      "schedule": [
+        "before 3am on Monday",
+      ],
     },
   ],
   "prConcurrentLimit": 5,
