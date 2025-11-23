@@ -28,14 +28,37 @@ detect_version() {
   local platform_name=$2
   local temp_bin=$(mktemp)
 
-  echo "Checking $platform_name..."
+  echo "Checking $platform_name..." >&2
   curl -s "$url" -o "$temp_bin"
   chmod +x "$temp_bin"
 
-  local version=$("$temp_bin" --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "unknown")
+  # Try to execute directly first (works for native platform)
+  local version=$("$temp_bin" --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")
+
+  # If direct execution fails, try Docker for Linux binaries
+  if [ -z "$version" ] && command -v docker &> /dev/null; then
+    case "$platform_name" in
+      linux-x64)
+        echo "  Direct execution failed, trying Docker (linux/amd64)..." >&2
+        docker run --rm --platform linux/amd64 -v "$temp_bin:/tmp/claude:ro" ubuntu:22.04 sh -c "apt-get update -qq && apt-get install -qq -y ca-certificates > /dev/null 2>&1 && /tmp/claude --version 2>&1" > /tmp/docker_output 2>&1 || true
+        version=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' /tmp/docker_output | head -1 || echo "unknown")
+        rm -f /tmp/docker_output
+        ;;
+      linux-arm64)
+        echo "  Direct execution failed, trying Docker (linux/arm64)..." >&2
+        docker run --rm --platform linux/arm64 -v "$temp_bin:/tmp/claude:ro" ubuntu:22.04 sh -c "apt-get update -qq && apt-get install -qq -y ca-certificates > /dev/null 2>&1 && /tmp/claude --version 2>&1" > /tmp/docker_output 2>&1 || true
+        version=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' /tmp/docker_output | head -1 || echo "unknown")
+        rm -f /tmp/docker_output
+        ;;
+      *)
+        version="unknown"
+        ;;
+    esac
+  fi
+
   rm -f "$temp_bin"
 
-  echo "  $platform_name: $version"
+  echo "  $platform_name: $version" >&2
   echo "$version"
 }
 
