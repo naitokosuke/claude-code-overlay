@@ -43,7 +43,7 @@
       versionCheckProgramArg = "--version";
 
       passthru = {
-        updateScript = ./update.sh;
+        updateScript = ./update;
       };
 
       meta = with lib; {
