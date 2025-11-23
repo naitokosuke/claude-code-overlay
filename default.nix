@@ -46,6 +46,9 @@
       # The official installer works around this by running `claude install` which downloads
       # the actual 2.x binary, but this requires network access during build.
       doInstallCheck = false;
+      # Prevent all install check phases including versionCheckPhase
+      installCheckPhase = "echo 'Skipping install check'";
+      dontCheck = true;
 
       passthru = {
         updateScript = ./update;
