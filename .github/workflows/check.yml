@@ -19,7 +19,10 @@ jobs:
         run: nix flake check -L
 
   version-check:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
@@ -33,9 +36,26 @@ jobs:
           LATEST_VERSION=$(jq -r 'keys | sort | last' sources.json)
           echo "Latest version: $LATEST_VERSION"
 
-          # Extract expected version from sources.json for x86_64-linux
-          EXPECTED_VERSION=$(jq -r --arg ver "$LATEST_VERSION" '.[$ver]["x86_64-linux"].actualBinaryVersion' sources.json)
-          echo "Expected version from sources.json (x86_64-linux): $EXPECTED_VERSION"
+          # Determine platform-specific key based on OS
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            PLATFORM="x86_64-linux"
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            # Detect macOS architecture
+            if [[ "$(uname -m)" == "arm64" ]]; then
+              PLATFORM="aarch64-darwin"
+            else
+              PLATFORM="x86_64-darwin"
+            fi
+          else
+            echo "❌ Unsupported OS: $RUNNER_OS"
+            exit 1
+          fi
+
+          echo "Platform: $PLATFORM"
+
+          # Extract expected version from sources.json for current platform
+          EXPECTED_VERSION=$(jq -r --arg ver "$LATEST_VERSION" --arg platform "$PLATFORM" '.[$ver][$platform].actualBinaryVersion' sources.json)
+          echo "Expected version from sources.json ($PLATFORM): $EXPECTED_VERSION"
 
           # Get actual version from built binary
           ACTUAL_VERSION=$(./result/bin/claude --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
