@@ -16,13 +16,13 @@
       "url": "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.0.49/linux-x64/claude",
       "version": "2.0.49",
       "sha256": "82023cb9149ad866c54a8aa4165e148bcf9674c3b11a3885cae898d2ae64ef8b",
-      "actualBinaryVersion": "1.3.2"
+      "actualBinaryVersion": "2.0.49"
     },
     "aarch64-linux": {
       "url": "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.0.49/linux-arm64/claude",
       "version": "2.0.49",
       "sha256": "9b8d520543d38b741a868127639df6bddecc837a338021b6ff75d97ac1e059d3",
-      "actualBinaryVersion": "1.3.2"
+      "actualBinaryVersion": "2.0.49"
     }
   }
 }
