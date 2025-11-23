@@ -12,6 +12,27 @@ This overlay downloads binaries directly from Anthropic's distribution servers, 
 - ✅ SHA256 checksum verification
 - ✅ Flake and non-flake support
 
+## Why Use This Overlay?
+
+While there are existing Claude Code packages in the Nix ecosystem ([nix-ai-tools](https://github.com/numtide/nix-ai-tools/blob/main/packages/claude-code/package.nix) and [nixpkgs](https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/by-name/cl/claude-code/package.nix)), this overlay provides the **official pre-built binary distribution** with several advantages:
+
+### Performance Benefits
+- **Native binary execution**: Official pre-built binaries from Anthropic run significantly faster than Node.js-based distributions
+- **Lower startup time**: No Node.js runtime overhead
+- **Reduced memory footprint**: Direct binary execution without JavaScript engine
+
+### Official Support
+- **Recommended by Anthropic**: The official Claude Code documentation recommends using the pre-built binary distribution for optimal performance
+- **Direct from source**: Binaries are downloaded directly from Anthropic's official distribution servers
+- **Guaranteed compatibility**: Official builds are tested and verified by Anthropic
+
+### Additional Benefits
+- **Faster updates**: Automated hourly checks ensure you get the latest version quickly
+- **Consistent behaviour**: Same binaries used across all platforms match official installation methods
+- **Simplified maintenance**: No need to rebuild from source or manage Node.js dependencies
+
+If you prioritise performance and want the officially supported distribution, this overlay is the recommended choice.
+
 ## Unfree Licence Notice
 
 Claude Code is distributed under an unfree licence. You must explicitly allow unfree packages to use this overlay.
