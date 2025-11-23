@@ -53,6 +53,7 @@
       };
 
       meta = with lib; {
+        inherit version;
         description = "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster";
         homepage = "https://claude.ai/code";
         downloadPage = "https://github.com/anthropics/claude-code/releases";
