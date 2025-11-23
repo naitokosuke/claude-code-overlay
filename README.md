@@ -231,7 +231,6 @@ nix flake check
 
 ## Credits
 
-- Inspired by [mitchellh/zig-overlay](https://github.com/mitchellh/zig-overlay)
 - Claude Code CLI by [Anthropic](https://anthropic.com)
 
 ## Licence
