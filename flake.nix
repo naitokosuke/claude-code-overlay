@@ -47,9 +47,10 @@
         };
       };
       # The packages exported by the Flake:
-      #  - default - latest /released/ version
-      #  - <version> - tagged version
-      packages = import ./default.nix {inherit system pkgs;};
+      packages = rec {
+        claude = pkgs.callPackage ./default.nix {};
+        default = claude;
+      };
 
       # "Apps" so that `nix run` works. If you run `nix run .` then
       # this will use the latest default.
