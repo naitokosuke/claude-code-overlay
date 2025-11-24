@@ -187,8 +187,8 @@ in
 
 ## How It Works
 
-1. The `update.py` script fetches the latest stable version from Anthropic's release server
-2. It uses `nix-prefetch-url` to fetch SHA256 checksums for all platforms
+1. The `update.ts` script (Bun/TypeScript) fetches the latest stable version from Anthropic's release server
+2. It retrieves official SHA256 checksums from manifest.json and converts them to SRI format
 3. GitHub Actions runs the update script hourly and commits any changes
 4. The flake provides pre-built binaries for all supported platforms
 

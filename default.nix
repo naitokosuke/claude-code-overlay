@@ -78,7 +78,7 @@ in
     versionCheckProgramArg = "--version";
 
     passthru = {
-      updateScript = ./update.py;
+      updateScript = ./update.ts;
     };
 
     meta = with lib; {
