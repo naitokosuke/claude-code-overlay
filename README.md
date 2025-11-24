@@ -17,19 +17,17 @@ This overlay downloads binaries directly from Anthropic's distribution servers, 
 While there are existing Claude Code packages in the Nix ecosystem ([nix-ai-tools](https://github.com/numtide/nix-ai-tools/blob/main/packages/claude-code/package.nix) and [nixpkgs](https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/by-name/cl/claude-code/package.nix)), this overlay provides the **official pre-built binary distribution** with several advantages:
 
 ### Performance Benefits
-- **Native binary execution**: Official pre-built binaries from Anthropic run significantly faster than Node.js-based distributions
-- **Lower startup time**: No Node.js runtime overhead
-- **Reduced memory footprint**: Direct binary execution without JavaScript engine
+- **Superior Bun performance**: Pre-built binaries compiled with Bun offer better performance than Node.js-based distributions with faster startup times, lower memory usage, and improved execution speed
 
 ### Official Support
 - **Recommended by Anthropic**: The official Claude Code documentation recommends using the pre-built binary distribution for optimal performance
-- **Direct from source**: Binaries are downloaded directly from Anthropic's official distribution servers
+- **Direct from official distribution**: Binaries downloaded directly from Anthropic's servers
 - **Guaranteed compatibility**: Official builds are tested and verified by Anthropic
 
 ### Additional Benefits
 - **Faster updates**: Automated hourly checks ensure you get the latest version quickly
 - **Consistent behaviour**: Same binaries used across all platforms match official installation methods
-- **Simplified maintenance**: No need to rebuild from source or manage Node.js dependencies
+- **Simplified maintenance**: No need to rebuild from source or manage runtime dependencies
 
 If you prioritise performance and want the officially supported distribution, this overlay is the recommended choice.
 
@@ -103,13 +101,21 @@ To avoid typing `NIXPKGS_ALLOW_UNFREE=1 --impure` every time, configure unfree p
 
 ### With Flakes
 
-#### Run directly
+#### Simple usage
 
-```bash
-NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
+Add the overlay to your flake inputs:
+
+```nix
+{
+  inputs = {
+    claude-code-overlay.url = "github:ryoppippi/claude-code-overlay";
+  };
+}
 ```
 
-#### Add to your flake
+Then use `pkgs.claude-code` in your configuration after adding the overlay to your `pkgs`.
+
+#### Add to NixOS
 
 ```nix
 {
@@ -118,16 +124,14 @@ NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
     claude-code-overlay.url = "github:ryoppippi/claude-code-overlay";
   };
 
-  outputs = { self, nixpkgs, claude-code-overlay, ... }: {
+  outputs = { nixpkgs, claude-code-overlay, ... }: {
     nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         ({ pkgs, lib, ... }: {
-          nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-            "claude"
-          ];
+          nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "claude" ];
           nixpkgs.overlays = [ claude-code-overlay.overlays.default ];
-          environment.systemPackages = [ pkgs.claudepkgs.default ];
+          environment.systemPackages = [ pkgs.claude-code ];
         })
       ];
     };
@@ -135,7 +139,7 @@ NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
 }
 ```
 
-#### Using in `home-manager`
+#### Add to home-manager
 
 ```nix
 {
@@ -149,16 +153,12 @@ NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
     homeConfigurations."user@hostname" = home-manager.lib.homeManagerConfiguration {
       pkgs = import nixpkgs {
         system = "x86_64-linux";
-        config.allowUnfreePredicate = pkg:
-          builtins.elem (nixpkgs.lib.getName pkg) [ "claude" ];
+        config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [ "claude" ];
         overlays = [ claude-code-overlay.overlays.default ];
       };
-
-      modules = [
-        {
-          home.packages = [ pkgs.claudepkgs.default ];
-        }
-      ];
+      modules = [{
+        home.packages = [ pkgs.claude-code ];
+      }];
     };
   };
 }
@@ -172,25 +172,23 @@ let
     url = "https://github.com/ryoppippi/claude-code-overlay/archive/main.tar.gz";
   });
   pkgs = import <nixpkgs> {
-    config.allowUnfreePredicate = pkg:
-      builtins.elem (pkgs.lib.getName pkg) [ "claude" ];
+    config.allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [ "claude" ];
     overlays = [ claude-code-overlay.overlays.default ];
   };
 in
-  pkgs.claudepkgs.default
+  pkgs.claude-code
 ```
 
 ## Available Packages
 
-- `default` - Latest stable version
-- `claude` - Claude Code CLI package
+When using the overlay, the package is available as `pkgs.claude-code`.
 
 ## How It Works
 
-1. The `update.ts` script (Bun/TypeScript) fetches the latest stable version from Anthropic's release server
+1. The `update.ts` script fetches the latest stable version from Anthropic's release server
 2. It retrieves official SHA256 checksums from manifest.json and converts them to SRI format
 3. GitHub Actions runs the update script hourly and commits any changes
-4. The flake provides pre-built binaries for all supported platforms
+4. The flake provides pre-built binaries compiled with Bun for all supported platforms
 
 ## Supported Platforms
 
@@ -215,13 +213,13 @@ This automatically loads the development environment and installs pre-commit hoo
 
 **Option 2: Manual**
 
-Enter the development shell to set up pre-commit hooks:
+Enter the development shell:
 
 ```bash
 nix develop
 ```
 
-This will automatically install git pre-commit hooks that run:
+This automatically installs git pre-commit hooks that run:
 - **alejandra** - Nix code formatter
 - **deadnix** - Dead code detection
 - **statix** - Nix linter
