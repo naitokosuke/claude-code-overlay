@@ -11,6 +11,7 @@ This overlay downloads binaries directly from Anthropic's distribution servers, 
 - ✅ Direct downloads from official Anthropic servers
 - ✅ SHA256 checksum verification
 - ✅ Flake and non-flake support
+- ✅ Binary cache via [Cachix](https://app.cachix.org/cache/ryoppippi) for faster builds
 
 ## Why Use This Overlay?
 
@@ -81,6 +82,18 @@ nixpkgs.config.allowUnfree = true;
 ```
 
 This permits **all** unfree packages system-wide without explicit review.
+
+## Binary Cache (Cachix)
+
+This overlay provides pre-built binaries via [Cachix](https://app.cachix.org/cache/ryoppippi). Using the binary cache avoids rebuilding packages locally and significantly speeds up installation.
+
+### Setup Cachix
+
+Add the `ryoppippi` cache to your Nix configuration:
+
+```bash
+cachix use ryoppippi
+```
 
 ## Usage
 

@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-      - uses: cachix/install-nix-action@0b0e072294b088b73964f1d72dfdac0951439dbd # v31.8.4
+      - uses: ./.github/actions/setup-nix
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Check Nix formatting
-        run: nix run .#fmt -- --fail-on-change
-      - name: Run git-hooks and formatting checks
-        run: nix flake check -L
+        run: cd dev && nix fmt -- --fail-on-change
+      - name: Run git-hooks checks
+        run: cd dev && nix flake check -L
 
   build-and-test:
     strategy:
@@ -25,9 +25,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-      - uses: cachix/install-nix-action@0b0e072294b088b73964f1d72dfdac0951439dbd # v31.8.4
+      - uses: ./.github/actions/setup-nix
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build package
         run: nix build -L
       - name: Check version
