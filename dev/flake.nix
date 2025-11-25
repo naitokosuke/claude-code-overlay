@@ -50,10 +50,6 @@
 
       devShells.default = pkgs.mkShell {
         inherit (self.checks.${system}.git-hooks-check) shellHook;
-        nativeBuildInputs = with pkgs; [
-          curl
-          jq
-        ];
       };
     });
 }
