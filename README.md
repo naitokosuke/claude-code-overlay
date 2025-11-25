@@ -199,6 +199,8 @@ When using the overlay, the package is available as `pkgs.claude-code`.
 
 ## Development
 
+Development tooling (formatters, linters, git hooks) is separated into `dev/flake.nix` to keep the main flake minimal for consumers. This means your `flake.lock` will only contain essential dependencies (`nixpkgs`, `flake-utils`), not development tools like `treefmt-nix` or `git-hooks`.
+
 ### Setup development environment
 
 **Option 1: Using direnv (Recommended)**
@@ -216,7 +218,7 @@ This automatically loads the development environment and installs pre-commit hoo
 Enter the development shell:
 
 ```bash
-nix develop
+nix develop ./dev
 ```
 
 This automatically installs git pre-commit hooks that run:
@@ -227,7 +229,7 @@ This automatically installs git pre-commit hooks that run:
 ### Update sources manually
 
 ```bash
-nix develop
+nix develop ./dev
 ./update
 ```
 
@@ -242,10 +244,10 @@ NIXPKGS_ALLOW_UNFREE=1 nix build --impure
 
 ```bash
 # Format all Nix files
-nix fmt
+nix fmt ./dev
 
-# Run all checks (formatting, linting, builds)
-nix flake check
+# Run all checks (formatting, linting)
+nix flake check ./dev
 ```
 
 ## Credits
