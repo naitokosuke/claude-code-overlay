@@ -6,8 +6,8 @@
 /**
  * Update script for claude package.
  *
- * Claude Code provides version info at a stable endpoint and distributes
- * platform-specific binaries with checksums in manifest.json.
+ * Fetches the latest version from npm registry and retrieves
+ * platform-specific binaries with checksums from manifest.json.
  *
  * Inspired by:
  * https://github.com/numtide/nix-ai-tools/blob/91132d4e72ed07374b9d4a718305e9282753bac9/packages/coderabbit-cli/update.py
@@ -41,13 +41,14 @@ const platforms = {
 type NixPlatform = keyof typeof platforms;
 
 /**
- * Fetch the latest version from Claude Code's stable endpoint.
+ * Fetch the latest version from npm registry.
+ * The GCS stable endpoint may lag behind npm releases.
  */
 async function fetchClaudeVersion(): Promise<string> {
-	const url = `${BASE_URL}/stable`;
+	const url = "https://registry.npmjs.org/@anthropic-ai/claude-code/latest";
 	const response = await fetch(url);
-	const text = await response.text();
-	return text.trim();
+	const json = await response.json() as { version: string };
+	return json.version;
 }
 
 /**
