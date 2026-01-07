@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-parts.url = "github:hercules-ci/flake-parts";
 
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
@@ -16,40 +16,46 @@
     };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    flake-utils,
+  outputs = inputs @ {
+    flake-parts,
     git-hooks,
     treefmt-nix,
+    ...
   }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+    flake-parts.lib.mkFlake {inherit inputs;} {
+      systems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
 
-      treefmtEval = treefmt-nix.lib.evalModule pkgs {
-        projectRootFile = "flake.nix";
-        programs = {
-          alejandra.enable = true;
-          deadnix.enable = true;
-          statix.enable = true;
-        };
-      };
-    in {
-      checks = {
-        git-hooks-check = git-hooks.lib.${system}.run {
-          src = ./..;
-          hooks = {
+      perSystem = {
+        pkgs,
+        self',
+        system,
+        ...
+      }: let
+        treefmtEval = treefmt-nix.lib.evalModule pkgs {
+          projectRootFile = "flake.nix";
+          programs = {
             alejandra.enable = true;
             deadnix.enable = true;
             statix.enable = true;
           };
         };
-      };
+      in {
+        checks = {
+          git-hooks-check = git-hooks.lib.${system}.run {
+            src = ./..;
+            hooks = {
+              alejandra.enable = true;
+              deadnix.enable = true;
+              statix.enable = true;
+            };
+          };
+        };
 
-      formatter = treefmtEval.config.build.wrapper;
+        formatter = treefmtEval.config.build.wrapper;
 
-      devShells.default = pkgs.mkShell {
-        inherit (self.checks.${system}.git-hooks-check) shellHook;
+        devShells.default = pkgs.mkShell {
+          inherit (self'.checks.git-hooks-check) shellHook;
+        };
       };
-    });
+    };
 }
