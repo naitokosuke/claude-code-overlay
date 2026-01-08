@@ -34,7 +34,7 @@
         treefmtEval = treefmt-nix.lib.evalModule pkgs {
           projectRootFile = "flake.nix";
           programs = {
-            alejandra.enable = true;
+            nixfmt-rfc-style.enable = true;
             deadnix.enable = true;
             statix.enable = true;
           };

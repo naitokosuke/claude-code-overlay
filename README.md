@@ -355,7 +355,7 @@ nix develop ./dev
 ```
 
 This automatically installs git pre-commit hooks that run:
-- **alejandra** - Nix code formatter
+- **nixfmt-rfc-style** - Nix code formatter (RFC 166)
 - **deadnix** - Dead code detection
 - **statix** - Nix linter
 
