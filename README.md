@@ -16,7 +16,7 @@ This overlay downloads binaries directly from Anthropic's distribution servers, 
 
 ## Why Use This Overlay?
 
-While there are existing Claude Code packages in the Nix ecosystem ([nix-ai-tools](https://github.com/numtide/nix-ai-tools/blob/main/packages/claude-code/package.nix) and [nixpkgs](https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/by-name/cl/claude-code/package.nix)), this overlay provides the **official pre-built binary distribution** with several advantages:
+While there are existing Claude Code packages in the Nix ecosystem ([llm-agents.nix](https://github.com/numtide/llm-agents.nix) and [nixpkgs](https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/by-name/cl/claude-code/package.nix)), this overlay provides the **official pre-built binary distribution** with several advantages:
 
 ### Performance Benefits
 - **Superior Bun performance**: Pre-built binaries compiled with Bun offer better performance than Node.js-based distributions with faster startup times, lower memory usage, and improved execution speed
@@ -382,6 +382,23 @@ nix fmt ./dev
 # Run all checks (formatting, linting)
 nix flake check ./dev
 ```
+
+## Related Projects
+
+- [llm-agents.nix](https://github.com/numtide/llm-agents.nix) - Nix flake providing various AI/LLM tools including Claude Code
+- [nixpkgs claude-code](https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/by-name/cl/claude-code/package.nix) - Official nixpkgs package for Claude Code
+
+### Comparison with llm-agents.nix
+
+Both this overlay and llm-agents.nix provide Claude Code packages using the official pre-built binaries. The main differences are:
+
+| Feature | claude-code-overlay | llm-agents.nix |
+|---------|---------------------|----------------|
+| **Scope** | Claude Code only | 50+ AI/LLM tools |
+| **Update frequency** | Hourly | Daily |
+| **home-manager module** | Yes | No |
+
+Choose **claude-code-overlay** if you want faster updates and a dedicated home-manager module for Claude Code. For other AI/LLM tools (Gemini CLI, OpenCode, etc.), we recommend using **llm-agents.nix**. Both can be used together.
 
 ## Credits
 
