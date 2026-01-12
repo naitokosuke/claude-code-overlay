@@ -307,6 +307,45 @@ nix develop
 claude --version
 ```
 
+#### Add to devenv
+
+Use Claude Code in a [devenv](https://devenv.sh/) development environment.
+
+**Add the input using CLI:**
+
+```bash
+devenv inputs add claude-code-overlay github:ryoppippi/claude-code-overlay
+```
+
+**Or manually in devenv.yaml:**
+
+```yaml
+inputs:
+  claude-code-overlay:
+    url: github:ryoppippi/claude-code-overlay
+```
+
+**devenv.nix:**
+
+```nix
+{ pkgs, inputs, ... }:
+{
+  packages = [
+    inputs.claude-code-overlay.packages.${pkgs.system}.default
+  ];
+
+  # Optional: use Cachix for faster builds
+  cachix.pull = [ "ryoppippi" ];
+}
+```
+
+Then run:
+
+```bash
+devenv shell
+claude --version
+```
+
 #### Add to home-manager (using overlay only)
 
 If you prefer not to use the module, you can use the overlay directly:
