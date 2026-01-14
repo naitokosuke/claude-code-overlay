@@ -15,7 +15,7 @@
   };
 
   outputs =
-    {
+    inputs@{
       self,
       nixpkgs,
       flake-parts,
@@ -29,7 +29,7 @@
         "aarch64-darwin"
       ];
     in
-    flake-parts.lib.mkFlake { inherit self; } {
+    flake-parts.lib.mkFlake { inherit inputs; } {
       inherit systems;
 
       imports = [
